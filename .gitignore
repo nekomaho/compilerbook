@@ -1,3 +1,5 @@
 compiler/tmp
 compiler/tmp.s
 compiler/9cc
+compiler/*~
+compiler/*.o
