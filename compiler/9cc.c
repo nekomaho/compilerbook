@@ -6,6 +6,47 @@
 
 static Token tokens[100];
 
+Node *new_node(int ty, Node *lhs, Node *rhs) {
+  Node *node = malloc(sizeof(Node));
+  node->ty = ty;
+  node->lhs = lhs;
+  node->rhs = rhs;
+
+  return node;
+}
+
+Node *new_node_num(int val) {
+  Node *node = malloc(sizeof(Node));
+
+  node->ty = ND_NUM;
+  node->val = val;
+
+  return node;
+}
+
+Node *expr() {
+  Node *node = mul();
+  if (tokens[pos].ty == '+') {
+    pos++;
+    return new_node('+', lhs, expr());
+  }
+
+  if (tokens[pos].ty == '-') {
+    pos++;
+    return new_node('-', lhs, expr());
+  }
+
+  return lhs;
+}
+
+Node *mul() {
+  Node *lhs = term();
+  if (tokens[pos].ty == '*') {
+    pos++;
+    return new_node()
+  }
+}
+
 void tokenize(char *p) {
   int i = 0;
   while(*p) {
