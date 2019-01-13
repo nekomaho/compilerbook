@@ -5,7 +5,15 @@
 #include "9cc.h"
 
 static Token tokens[100];
+static Node *code[100];
 static int pos = 0;
+static int sentence = 0;
+
+void new_code(Node *node) {
+  code[sentence] = node;
+  sentence++;
+  code[sentence] = NULL;
+}
 
 Node* new_node(int ty, Node *lhs, Node *rhs) {
   Node* node = malloc(sizeof(Node));
@@ -23,6 +31,35 @@ Node* new_node_num(int val) {
   node->val = val;
 
   return node;
+}
+
+Node* new_node_idnet(char name) {
+  Node* node = malloc(sizeof(Node));
+
+  node->ty = ND_IDNET;
+  node->name = name;
+
+  return node;
+}
+
+Node* assign() {
+  Node* lhs = expr();
+
+  if (tokens[pos].ty == ';')
+    return lhs;
+
+  return new_node('=', lhs, assign());
+}
+
+void program() {
+  Node* lhs = assign();
+
+  pos++;
+  if (tokens[pos].ty != TK_EOF) {
+    program();
+  }
+
+  new_code(lhs);
 }
 
 Node* expr() {
@@ -59,6 +96,9 @@ Node* term() {
   if (tokens[pos].ty == TK_NUM)
     return new_node_num(tokens[pos++].val);
 
+  if (tokens[pos].ty == TK_IDENT)
+    return new_node_idnet((char)tokens[pos++].val);
+
   if (tokens[pos].ty == '(') {
     pos++;
     Node *node = expr();
@@ -75,10 +115,42 @@ Node* term() {
   fprintf(stderr, "数値でも開きカッコでもないトークンです：%s", tokens[pos].input);
   exit(1);
 }
+void gen_lval(Node *node){
+  if (node->ty == ND_IDNET) {
+    printf("  mov rax, rbp\n");
+    printf("  sub rax, %d\n",('z' - node->name + 1) * 8);
+    printf("  push rax\n");
+
+    return;
+  }
+
+  fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[pos].input);
+  exit(1);
+
+}
 
 void gen(Node *node) {
   if (node->ty == ND_NUM) {
     printf("  push %d\n", node->val);
+    return;
+  }
+
+  if (node->ty == ND_IDNET) {
+    gen_lval(node);
+    printf("  pop rax\n");
+    printf("  mov rax, [rax]\n");
+    printf("  push rax\n");
+    return;
+  }
+
+  if (node->ty == '=') {
+    gen_lval(node->lhs);
+    gen(node->rhs);
+
+    printf("  pop rdi\n");
+    printf("  pop rax\n");
+    printf("  mov [rax], rdi\n");
+    printf("  push rdi\n");
     return;
   }
 
@@ -121,6 +193,8 @@ void tokenize(char *p) {
       case '(':
       case ')':
       case '/':
+      case '=':
+      case ';':
         tokens[i].ty = *p;
         tokens[i].input = p;
         i++;
@@ -133,6 +207,14 @@ void tokenize(char *p) {
       tokens[i].input = p;
       tokens[i].val = strtol(p, &p, 10);
       i++;
+      continue;
+    }
+
+    if ('a' <= *p && *p <= 'z') {
+      tokens[i].ty = TK_IDENT;
+      tokens[i].input = p;
+      i++;
+      p++;
       continue;
     }
 
@@ -156,17 +238,31 @@ int main(int argc, char **argv) {
   }
 
   tokenize(argv[1]);
-
-  Node* node = expr();
+  program();
 
   printf(".intel_syntax noprefix\n");
   printf(".global _main\n");
   printf("_main:\n");
 
-  // 抽象構文木を降りながらコード生成
-  gen(node);
+  // プロローグ
+  // 変数26個分の領域を確保する
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
 
-  printf("  pop rax\n");
+  // 先頭の式から順にコード生成
+  for (int i = 0; code[i]; i++) {
+    gen(code[i]);
+
+    // 式の評価結果としてスタックに一つの値が残っている
+    // はずなので、スタックが溢れないようにポップしておく
+    printf("  pop rax\n");
+  }
+
+  // エピローグ
+  // 最後の式の結果がRAXに残っているのでそれが返り値になる
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
   printf("  ret\n");
   return 0;
 }
