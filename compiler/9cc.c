@@ -48,18 +48,23 @@ Node* assign() {
   if (tokens[pos].ty == ';')
     return lhs;
 
-  return new_node('=', lhs, assign());
+  if (tokens[pos].ty == '=') {
+    pos++;
+    return new_node('=', lhs, assign());
+  }
+
+  return lhs;
 }
 
 void program() {
   Node* lhs = assign();
 
+  new_code(lhs);
   pos++;
+
   if (tokens[pos].ty != TK_EOF) {
     program();
   }
-
-  new_code(lhs);
 }
 
 Node* expr() {
@@ -213,6 +218,7 @@ void tokenize(char *p) {
     if ('a' <= *p && *p <= 'z') {
       tokens[i].ty = TK_IDENT;
       tokens[i].input = p;
+      tokens[i].val =  *p;
       i++;
       p++;
       continue;
