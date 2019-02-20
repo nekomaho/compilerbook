@@ -9,6 +9,24 @@ static Node *code[100];
 static int pos = 0;
 static int sentence = 0;
 
+Vector *new_vector() {
+  Vector *vec= malloc(sizeof(Vector));
+  vec->data = malloc(sizeof(void *) * 16);
+  vec->capacity = 16;
+  vec->len = 0;
+
+  return vec;
+}
+
+void vec_push(Vector *vec, void *elem) {
+  if (vec->capacity == vec->len) {
+    vec->capacity *= 2;
+    vec->data = reallocf(vec->data, sizeof(void *) * vec->capacity);
+  }
+
+  vec->data[vec->len++] = elem;
+}
+
 void new_code(Node *node) {
   code[sentence] = node;
   sentence++;
