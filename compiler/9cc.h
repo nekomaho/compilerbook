@@ -34,6 +34,10 @@ typedef struct {
 
 Vector *new_vector(void);
 void vec_push(Vector *vec, void *elem);
+
+int expect(int line, int expected, int actual);
+void runtest(void);
+
 void tokenize(char *p);
 void error(int i);
 void new_code(Node *node);

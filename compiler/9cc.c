@@ -9,6 +9,22 @@ static Node *code[100];
 static int pos = 0;
 static int sentence = 0;
 
+int expect(int line, int expected, int actual) {
+  if (expected == actual) {
+    return 0;
+  }
+
+  fprintf(stderr, "%d: %d expected, but got %d\n",line, expected, actual);
+  exit(1);
+}
+
+void runtest(void) {
+  Vector *vector = new_vector();
+
+  expect(__LINE__, 0, vector->len);
+
+}
+
 Vector *new_vector() {
   Vector *vec= malloc(sizeof(Vector));
   vec->data = malloc(sizeof(void *) * 16);
