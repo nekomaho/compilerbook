@@ -22,8 +22,19 @@ void runtest(void) {
   Vector *vector = new_vector();
 
   expect(__LINE__, 0, vector->len);
+  expect(__LINE__, 16, vector->capacity);
 
+  for (int i = 0; i < 100; i++)
+    vec_push(vector, (void *)i);
+
+    expect(__LINE__, 100, vector->len);
+    expect(__LINE__, 0, (int)vector->data[0]);
+    expect(__LINE__, 50, (int)vector->data[50]);
+    expect(__LINE__, 99, (int)vector->data[99]);
+
+    printf("OK\n");
 }
+
 
 Vector *new_vector() {
   Vector *vec= malloc(sizeof(Vector));
@@ -275,6 +286,11 @@ int main(int argc, char **argv) {
   if(argc !=2) {
     fprintf(stderr, "invalid arguments");
     return 1;
+  }
+
+  if(!strcmp(argv[1], "-test")) {
+    runtest();
+    return 0;
   }
 
   tokenize(argv[1]);
