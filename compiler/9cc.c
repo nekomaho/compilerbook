@@ -3,56 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "9cc.h"
+#include "vector.h"
+#include "test/test.h"
 
 static Token tokens[100];
 static Node *code[100];
 static int pos = 0;
 static int sentence = 0;
 
-int expect(int line, int expected, int actual) {
-  if (expected == actual) {
-    return 0;
-  }
-
-  fprintf(stderr, "%d: %d expected, but got %d\n",line, expected, actual);
-  exit(1);
-}
-
-void runtest(void) {
-  Vector *vector = new_vector();
-
-  expect(__LINE__, 0, vector->len);
-  expect(__LINE__, 16, vector->capacity);
-
-  for (int i = 0; i < 100; i++)
-    vec_push(vector, (void *)i);
-
-    expect(__LINE__, 100, vector->len);
-    expect(__LINE__, 0, (int)vector->data[0]);
-    expect(__LINE__, 50, (int)vector->data[50]);
-    expect(__LINE__, 99, (int)vector->data[99]);
-
-    printf("OK\n");
-}
-
-
-Vector *new_vector() {
-  Vector *vec= malloc(sizeof(Vector));
-  vec->data = malloc(sizeof(void *) * 16);
-  vec->capacity = 16;
-  vec->len = 0;
-
-  return vec;
-}
-
-void vec_push(Vector *vec, void *elem) {
-  if (vec->capacity == vec->len) {
-    vec->capacity *= 2;
-    vec->data = reallocf(vec->data, sizeof(void *) * vec->capacity);
-  }
-
-  vec->data[vec->len++] = elem;
-}
 
 void new_code(Node *node) {
   code[sentence] = node;

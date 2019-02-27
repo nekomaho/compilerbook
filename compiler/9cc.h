@@ -26,18 +26,6 @@ typedef struct Node {
   char name; //tyがND_IDNETの場合に変数名が入る
 } Node;
 
-typedef struct {
-  void **data;
-  int capacity;
-  int len;
-} Vector;
-
-Vector *new_vector(void);
-void vec_push(Vector *vec, void *elem);
-
-int expect(int line, int expected, int actual);
-void runtest(void);
-
 void tokenize(char *p);
 void error(int i);
 void new_code(Node *node);
