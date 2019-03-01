@@ -1,3 +1,6 @@
+#ifndef __9CC_H__
+#define __9CC_H__
+
 enum {
   ND_NUM = 256, // 整数ノードの型
   ND_IDNET,
@@ -37,3 +40,5 @@ Node *expr(void);
 Node *mul(void);
 Node *term(void);
 void gen(Node *node);
+
+#endif
