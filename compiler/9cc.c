@@ -1,9 +1,9 @@
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "9cc.h"
 #include "vector.h"
+#include "tokenize.h"
 #include "test/test.h"
 
 static Token tokens[100];
@@ -158,55 +158,6 @@ void gen(Node *node) {
   printf("  push rax\n");
 }
 
-void tokenize(char *p) {
-  int i = 0;
-  while(*p) {
-    if (isspace(*p)) {
-      p++;
-      continue;
-    }
-
-    switch(*p) {
-      case '+':
-      case '-':
-      case '*':
-      case '(':
-      case ')':
-      case '/':
-      case '=':
-      case ';':
-        tokens[i].ty = *p;
-        tokens[i].input = p;
-        i++;
-        p++;
-        continue;
-    }
-
-    if(isdigit(*p)) {
-      tokens[i].ty = TK_NUM;
-      tokens[i].input = p;
-      tokens[i].val = strtol(p, &p, 10);
-      i++;
-      continue;
-    }
-
-    if ('a' <= *p && *p <= 'z') {
-      tokens[i].ty = TK_IDENT;
-      tokens[i].input = p;
-      tokens[i].val =  *p;
-      i++;
-      p++;
-      continue;
-    }
-
-    fprintf(stderr, "トークナイズ出来ません: %s\n", p);
-    exit(1);
-  }
-
-  tokens[i].ty = TK_EOF;
-  tokens[i].input = p;
-}
-
 void error(int i) {
   fprintf(stderr, "予期せぬトークンです: %s\n", tokens[i].input);
   exit(1);
@@ -223,6 +174,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
+  allocate_tokens(tokens);
   tokenize(argv[1]);
   program();
 

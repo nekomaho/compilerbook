@@ -1,7 +1,8 @@
-9cc: 9cc.o vector.o node.o test/test.o
+9cc: 9cc.o vector.o node.o tokenize.o test/test.o
 
 9cc.o: 9cc.h node.h test/test.h vector.h
 node.o: node.h
+tokenize.o: tokenize.h
 vector.o: vector.h
 test/test.o: vector.h test/test.h
 
