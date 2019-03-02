@@ -1,6 +1,7 @@
-9cc: 9cc.o vector.o test/test.o
+9cc: 9cc.o vector.o node.o test/test.o
 
-9cc.o: 9cc.h test/test.h vector.h
+9cc.o: 9cc.h node.h test/test.h vector.h
+node.o: node.h
 vector.o: vector.h
 test/test.o: vector.h test/test.h
 

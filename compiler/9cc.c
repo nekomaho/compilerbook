@@ -7,42 +7,14 @@
 #include "test/test.h"
 
 static Token tokens[100];
-static Node *code[100];
 static int pos = 0;
+static Node *code[100];
 static int sentence = 0;
-
 
 void new_code(Node *node) {
   code[sentence] = node;
   sentence++;
   code[sentence] = NULL;
-}
-
-Node* new_node(int ty, Node *lhs, Node *rhs) {
-  Node* node = malloc(sizeof(Node));
-  node->ty = ty;
-  node->lhs = lhs;
-  node->rhs = rhs;
-
-  return node;
-}
-
-Node* new_node_num(int val) {
-  Node* node = malloc(sizeof(Node));
-
-  node->ty = ND_NUM;
-  node->val = val;
-
-  return node;
-}
-
-Node* new_node_idnet(char name) {
-  Node* node = malloc(sizeof(Node));
-
-  node->ty = ND_IDNET;
-  node->name = name;
-
-  return node;
 }
 
 Node* assign() {
