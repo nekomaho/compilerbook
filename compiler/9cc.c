@@ -3,98 +3,12 @@
 #include <string.h>
 #include "9cc.h"
 #include "vector.h"
+#include "program.h"
 #include "tokenize.h"
 #include "test/test.h"
 
 static Token tokens[100];
-static int pos = 0;
-static Node *code[100];
-static int sentence = 0;
 
-void new_code(Node *node) {
-  code[sentence] = node;
-  sentence++;
-  code[sentence] = NULL;
-}
-
-Node* assign() {
-  Node* lhs = expr();
-
-  if (tokens[pos].ty == ';')
-    return lhs;
-
-  if (tokens[pos].ty == '=') {
-    pos++;
-    return new_node('=', lhs, assign());
-  }
-
-  return lhs;
-}
-
-void program() {
-  Node* lhs = assign();
-
-  new_code(lhs);
-  pos++;
-
-  if (tokens[pos].ty != TK_EOF) {
-    program();
-  }
-}
-
-Node* expr() {
-  Node* lhs = mul();
-  if (tokens[pos].ty == '+') {
-    pos++;
-    return new_node('+', lhs, expr());
-  }
-
-  if (tokens[pos].ty == '-') {
-    pos++;
-    return new_node('-', lhs, expr());
-  }
-
-  return lhs;
-}
-
-Node* mul() {
-  Node* lhs = term();
-  if (tokens[pos].ty == '*') {
-    pos++;
-    return new_node('*', lhs, mul());
-  }
-
-  if (tokens[pos].ty == '/') {
-    pos++;
-    return new_node('/', lhs, mul());
-  }
-
-  return lhs;
-}
-
-Node* term() {
-  if (tokens[pos].ty == TK_NUM)
-    return new_node_num(tokens[pos++].val);
-
-  if (tokens[pos].ty == TK_IDENT)
-    return new_node_idnet((char)tokens[pos++].val);
-
-  if (tokens[pos].ty == '(') {
-    pos++;
-    Node *node = expr();
-
-    if (tokens[pos].ty != ')') {
-      fprintf(stderr, "開きカッコに対する閉じカッコがありません：%s", tokens[pos].input);
-      exit(1);
-    }
-
-    pos++;
-    return node;
-  }
-
-  fprintf(stderr, "数値でも開きカッコでもないトークンです：%s", tokens[pos].input);
-  exit(1);
-}
 void gen_lval(Node *node){
   if (node->ty == ND_IDNET) {
     printf("  mov rax, rbp\n");
@@ -104,7 +18,7 @@ void gen_lval(Node *node){
     return;
   }
 
-  fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[pos].input);
+  fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[get_potition()].input);
   exit(1);
 
 }
@@ -158,11 +72,6 @@ void gen(Node *node) {
   printf("  push rax\n");
 }
 
-void error(int i) {
-  fprintf(stderr, "予期せぬトークンです: %s\n", tokens[i].input);
-  exit(1);
-}
-
 int main(int argc, char **argv) {
   if(argc !=2) {
     fprintf(stderr, "invalid arguments");
@@ -176,7 +85,9 @@ int main(int argc, char **argv) {
 
   allocate_tokens(tokens);
   tokenize(argv[1]);
-  program();
+
+  set_tokens(tokens);
+  program(tokens);
 
   printf(".intel_syntax noprefix\n");
   printf(".global _main\n");
@@ -189,8 +100,8 @@ int main(int argc, char **argv) {
   printf("  sub rsp, 208\n");
 
   // 先頭の式から順にコード生成
-  for (int i = 0; code[i]; i++) {
-    gen(code[i]);
+  for (int i = 0; ast(i); i++) {
+    gen(ast(i));
 
     // 式の評価結果としてスタックに一つの値が残っている
     // はずなので、スタックが溢れないようにポップしておく

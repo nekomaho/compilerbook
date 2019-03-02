@@ -4,11 +4,7 @@
 #include "node.h"
 
 void error(int i);
-void new_code(Node *node);
-Node* assign(void);
-Node *expr(void);
-Node *mul(void);
-Node *term(void);
+void gen_lval(Node *node);
 void gen(Node *node);
 
 #endif
