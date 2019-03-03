@@ -5,72 +5,11 @@
 #include "vector.h"
 #include "program.h"
 #include "tokenize.h"
+#include "node.h"
+#include "gen.h"
 #include "test/test.h"
 
 static Token tokens[100];
-
-void gen_lval(Node *node){
-  if (node->ty == ND_IDNET) {
-    printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n",('z' - node->name + 1) * 8);
-    printf("  push rax\n");
-
-    return;
-  }
-
-  fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[get_potition()].input);
-  exit(1);
-
-}
-
-void gen(Node *node) {
-  if (node->ty == ND_NUM) {
-    printf("  push %d\n", node->val);
-    return;
-  }
-
-  if (node->ty == ND_IDNET) {
-    gen_lval(node);
-    printf("  pop rax\n");
-    printf("  mov rax, [rax]\n");
-    printf("  push rax\n");
-    return;
-  }
-
-  if (node->ty == '=') {
-    gen_lval(node->lhs);
-    gen(node->rhs);
-
-    printf("  pop rdi\n");
-    printf("  pop rax\n");
-    printf("  mov [rax], rdi\n");
-    printf("  push rdi\n");
-    return;
-  }
-
-  gen(node->lhs);
-  gen(node->rhs);
-
-  printf("  pop rdi\n");
-  printf("  pop rax\n");
-
-  switch (node->ty) {
-    case '+':
-      printf("  add rax, rdi\n");
-      break;
-    case '-':
-      printf("  sub rax, rdi\n");
-      break;
-    case '*':
-      printf("  mul rdi\n");
-      break;
-    case '/':
-      printf("  mov rdx, 0\n");
-      printf("  div rdi\n");
-  }
-
-  printf("  push rax\n");
-}
 
 int main(int argc, char **argv) {
   if(argc !=2) {
@@ -101,7 +40,10 @@ int main(int argc, char **argv) {
 
   // 先頭の式から順にコード生成
   for (int i = 0; ast(i); i++) {
-    gen(ast(i));
+    if (GEN_ERROR_END == gen(ast(i))) {
+      fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[get_potition()].input);
+      exit(-1);
+    }
 
     // 式の評価結果としてスタックに一つの値が残っている
     // はずなので、スタックが溢れないようにポップしておく
