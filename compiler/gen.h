@@ -6,6 +6,6 @@
 #define GEN_ERROR_END 0x00
 #define GEN_SUCCESS 0x01
 
-int gen(Node *node);
+int output_asm(void);
 
 #endif

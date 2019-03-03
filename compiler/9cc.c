@@ -28,32 +28,10 @@ int main(int argc, char **argv) {
   set_tokens(tokens);
   program(tokens);
 
-  printf(".intel_syntax noprefix\n");
-  printf(".global _main\n");
-  printf("_main:\n");
-
-  // プロローグ
-  // 変数26個分の領域を確保する
-  printf("  push rbp\n");
-  printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
-
-  // 先頭の式から順にコード生成
-  for (int i = 0; ast(i); i++) {
-    if (GEN_ERROR_END == gen(ast(i))) {
-      fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[get_potition()].input);
-      exit(-1);
-    }
-
-    // 式の評価結果としてスタックに一つの値が残っている
-    // はずなので、スタックが溢れないようにポップしておく
-    printf("  pop rax\n");
+  if (GEN_ERROR_END == output_asm()) {
+    fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[get_potition()].input);
+    exit(-1);
   }
 
-  // エピローグ
-  // 最後の式の結果がRAXに残っているのでそれが返り値になる
-  printf("  mov rsp, rbp\n");
-  printf("  pop rbp\n");
-  printf("  ret\n");
   return 0;
 }

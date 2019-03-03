@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "gen.h"
+#include "program.h"
 #include "tokenize.h"
 
 static int gen_lval(Node *node){
@@ -61,5 +62,35 @@ int gen(Node *node) {
   }
 
   printf("  push rax\n");
+  return GEN_SUCCESS;
+}
+
+int output_asm(void) {
+  printf(".intel_syntax noprefix\n");
+  printf(".global _main\n");
+  printf("_main:\n");
+
+  // プロローグ
+  // 変数26個分の領域を確保する
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
+
+  // 先頭の式から順にコード生成
+  for (int i = 0; ast(i); i++) {
+    if (GEN_ERROR_END == gen(ast(i)))
+      return GEN_ERROR_END;
+
+    // 式の評価結果としてスタックに一つの値が残っている
+    // はずなので、スタックが溢れないようにポップしておく
+    printf("  pop rax\n");
+  }
+
+  // エピローグ
+  // 最後の式の結果がRAXに残っているのでそれが返り値になる
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
+  printf("  ret\n");
+
   return GEN_SUCCESS;
 }
