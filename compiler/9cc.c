@@ -9,7 +9,7 @@
 #include "gen.h"
 #include "test/test.h"
 
-static Token tokens[100];
+static Vector *tokens;
 
 int main(int argc, char **argv) {
   if(argc !=2) {
@@ -22,14 +22,13 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  allocate_tokens(tokens);
-  tokenize(argv[1]);
+  tokens = tokenize(argv[1]);
 
   set_tokens(tokens);
   program(tokens);
 
   if (GEN_ERROR_END == output_asm()) {
-    fprintf(stderr, "代入の左辺値が変数ではありません：%s", tokens[get_potition()].input);
+    fprintf(stderr, "代入の左辺値が変数ではありません：%s", (char *)((Token *)(tokens->data)[get_position()])->input);
     exit(-1);
   }
 

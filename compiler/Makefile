@@ -4,7 +4,7 @@
 gen.o: gen.h tokenize.h node.h program.h
 program.o: program.h node.h tokenize.h
 node.o: node.h
-tokenize.o: tokenize.h
+tokenize.o: tokenize.h vector.h
 vector.o: vector.h
 test/test.o: test/vector_test.h test/test.h
 test/vector_test.o: vector.h test/vector_test.h

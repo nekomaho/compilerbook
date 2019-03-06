@@ -3,20 +3,20 @@
 #include <ctype.h>
 #include "tokenize.h"
 
-static Token *tokens;
-
-/* FIXME 後で内部で確保出来るように変更する */
-void allocate_tokens(Token *empty_tokens) {
-    tokens = empty_tokens;
-}
-
-void tokenize(char *p) {
+Vector *tokenize(char *p) {
   int i = 0;
+  Vector *tokens;
+  Token *token;
+
+  tokens = new_vector();
+
   while(*p) {
     if (isspace(*p)) {
       p++;
       continue;
     }
+
+    token = malloc(sizeof(Token));
 
     switch(*p) {
       case '+':
@@ -27,27 +27,30 @@ void tokenize(char *p) {
       case '/':
       case '=':
       case ';':
-        tokens[i].ty = *p;
-        tokens[i].input = p;
+        token->ty = *p;
+        token->input = p;
         i++;
         p++;
+        vec_push(tokens, token);
         continue;
     }
 
     if(isdigit(*p)) {
-      tokens[i].ty = TK_NUM;
-      tokens[i].input = p;
-      tokens[i].val = strtol(p, &p, 10);
+      token->ty = TK_NUM;
+      token->input = p;
+      token->val = strtol(p, &p, 10);
       i++;
+      vec_push(tokens, token);
       continue;
     }
 
     if ('a' <= *p && *p <= 'z') {
-      tokens[i].ty = TK_IDENT;
-      tokens[i].input = p;
-      tokens[i].val =  *p;
+      token->ty = TK_IDENT;
+      token->input = p;
+      token->val =  *p;
       i++;
       p++;
+      vec_push(tokens, token);
       continue;
     }
 
@@ -55,6 +58,10 @@ void tokenize(char *p) {
     exit(1);
   }
 
-  tokens[i].ty = TK_EOF;
-  tokens[i].input = p;
+  token = malloc(sizeof(Token));
+  token->ty = TK_EOF;
+  token->input = p;
+  vec_push(tokens, token);
+
+  return tokens;
 }

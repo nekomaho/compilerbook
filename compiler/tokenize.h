@@ -1,6 +1,8 @@
 #ifndef __TOKENIZE_H__
 #define __TOKENIZE_H__
 
+#include "vector.h"
+
 // トークンの型を表す値
 enum {
   TK_NUM = 256, // 整数トークン
@@ -15,7 +17,6 @@ typedef struct {
   char *input; //トークン文字列
 } Token;
 
-void allocate_tokens(Token *empty_tokens);
-void tokenize(char *p);
+Vector *tokenize(char *p);
 
 #endif

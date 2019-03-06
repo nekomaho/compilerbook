@@ -1,17 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "tokenize.h"
+#include "vector.h"
 #include "program.h"
 
 static Node *code[100];
 static int sentence = 0;
 static int pos = 0;
-static Token *tokens;
+static Vector *tokens;
 
-int get_potition()  {
+int get_position()  {
     return pos;
 }
-void set_tokens(Token *empty_tokens) {
-    tokens = empty_tokens;
+void set_tokens(Vector *analyzed_tokens) {
+    tokens = analyzed_tokens;
 }
 
 Node *ast(int index) {
@@ -24,13 +26,21 @@ void new_code(Node *node) {
   code[sentence] = NULL;
 }
 
+static Token *get_token_from_tokens(int pos) {
+  return (Token *)(tokens->data)[pos];
+}
+
+
 Node* assign() {
+  Token *token;
+
   Node* lhs = expr();
 
-  if (tokens[pos].ty == ';')
+  token = get_token_from_tokens(pos);
+  if (token->ty == ';')
     return lhs;
 
-  if (tokens[pos].ty == '=') {
+  if (token->ty == '=') {
     pos++;
     return new_node('=', lhs, assign());
   }
@@ -39,25 +49,31 @@ Node* assign() {
 }
 
 void program() {
-    Node *lhs = assign();
+  Token *token;
 
-    new_code(lhs);
-    pos++;
+  Node *lhs = assign();
 
-    if (tokens[pos].ty != TK_EOF)
-    {
-        program();
-    }
+  new_code(lhs);
+  pos++;
+
+  token = get_token_from_tokens(pos);
+  if (token->ty != TK_EOF) {
+    program();
+  }
 }
 
 Node* expr() {
+  Token *token;
+
   Node* lhs = mul();
-  if (tokens[pos].ty == '+') {
+
+  token = get_token_from_tokens(pos);
+  if (token->ty == '+') {
     pos++;
     return new_node('+', lhs, expr());
   }
 
-  if (tokens[pos].ty == '-') {
+  if (token->ty == '-') {
     pos++;
     return new_node('-', lhs, expr());
   }
@@ -66,13 +82,17 @@ Node* expr() {
 }
 
 Node* mul() {
+  Token *token;
+
   Node* lhs = term();
-  if (tokens[pos].ty == '*') {
+
+  token = get_token_from_tokens(pos);
+  if (token->ty == '*') {
     pos++;
     return new_node('*', lhs, mul());
   }
 
-  if (tokens[pos].ty == '/') {
+  if (token->ty == '/') {
     pos++;
     return new_node('/', lhs, mul());
   }
@@ -81,18 +101,28 @@ Node* mul() {
 }
 
 Node* term() {
-  if (tokens[pos].ty == TK_NUM)
-    return new_node_num(tokens[pos++].val);
+  Token *token;
+  token = get_token_from_tokens(pos);
 
-  if (tokens[pos].ty == TK_IDENT)
-    return new_node_idnet((char)tokens[pos++].val);
+  if (token->ty == TK_NUM) {
+    token = get_token_from_tokens(pos);
+    pos++;
+    return new_node_num(token->val);
+  }
 
-  if (tokens[pos].ty == '(') {
+  if (token->ty == TK_IDENT) {
+    token = get_token_from_tokens(pos);
+    pos++;
+    return new_node_idnet((char)token->val);
+  }
+
+  if (token->ty == '(') {
     pos++;
     Node *node = expr();
 
-    if (tokens[pos].ty != ')') {
-      fprintf(stderr, "開きカッコに対する閉じカッコがありません：%s", tokens[pos].input);
+    token = get_token_from_tokens(pos);
+    if (token->ty != ')') {
+      fprintf(stderr, "開きカッコに対する閉じカッコがありません：%s", token->input);
       exit(1);
     }
 
@@ -100,6 +130,6 @@ Node* term() {
     return node;
   }
 
-  fprintf(stderr, "数値でも開きカッコでもないトークンです：%s", tokens[pos].input);
+  fprintf(stderr, "数値でも開きカッコでもないトークンです：%s", (char *)token->input);
   exit(1);
 }

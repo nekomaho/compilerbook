@@ -4,8 +4,8 @@
 #include "node.h"
 #include "tokenize.h"
 
-int get_potition(void);
-void set_tokens(Token *empty_tokens);
+int get_position(void);
+void set_tokens(Vector *analyzed_tokens);
 Node* ast(int index);
 void program();
 void new_code(Node *node);
