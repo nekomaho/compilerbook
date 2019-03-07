@@ -77,7 +77,7 @@ int output_asm(void) {
   printf("  sub rsp, 208\n");
 
   // 先頭の式から順にコード生成
-  for (int i = 0; ast(i); i++) {
+  for (int i = 0; i < number_of_ast(); i++) {
     if (GEN_ERROR_END == gen(ast(i)))
       return GEN_ERROR_END;
 

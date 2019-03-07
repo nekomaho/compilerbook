@@ -4,7 +4,7 @@
 #include "vector.h"
 #include "program.h"
 
-static Node *code[100];
+static Vector *code;
 static int sentence = 0;
 static int pos = 0;
 static Vector *tokens;
@@ -13,23 +13,25 @@ int get_position()  {
     return pos;
 }
 void set_tokens(Vector *analyzed_tokens) {
-    tokens = analyzed_tokens;
+  code = new_vector();
+  tokens = analyzed_tokens;
+}
+
+int number_of_ast(void) {
+  return code->len;
 }
 
 Node *ast(int index) {
-    return code[index];
+    return code->data[index];
 }
 
 void new_code(Node *node) {
-  code[sentence] = node;
-  sentence++;
-  code[sentence] = NULL;
+  vec_push(code, node);
 }
 
 static Token *get_token_from_tokens(int pos) {
   return (Token *)(tokens->data)[pos];
 }
-
 
 Node* assign() {
   Token *token;
