@@ -6,6 +6,7 @@
 
 static Vector *code;
 static int sentence = 0;
+static int stack_count = 0;
 static int pos = 0;
 static Vector *tokens;
 
@@ -15,6 +16,10 @@ int get_position()  {
 void set_tokens(Vector *analyzed_tokens) {
   code = new_vector();
   tokens = analyzed_tokens;
+}
+
+int max_stack_count() {
+  return stack_count;
 }
 
 int number_of_ast(void) {
@@ -109,12 +114,14 @@ Node* term() {
   if (token->ty == TK_NUM) {
     token = get_token_from_tokens(pos);
     pos++;
+    stack_count++;
     return new_node_num(token->val);
   }
 
   if (token->ty == TK_IDENT) {
     token = get_token_from_tokens(pos);
     pos++;
+    stack_count++;
     return new_node_idnet((char)token->val);
   }
 

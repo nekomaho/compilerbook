@@ -16,4 +16,3 @@ void vector_tests() {
   expect(__FILE__, __LINE__, 50, (int)vector->data[50]);
   expect(__FILE__, __LINE__, 99, (int)vector->data[99]);
 }
-

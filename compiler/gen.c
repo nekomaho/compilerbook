@@ -74,7 +74,7 @@ int output_asm(void) {
   // 変数26個分の領域を確保する
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, %d\n", max_stack_count() * ALLOCATE_UNIT);
 
   // 先頭の式から順にコード生成
   for (int i = 0; i < number_of_ast(); i++) {
