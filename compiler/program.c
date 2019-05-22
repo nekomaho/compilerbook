@@ -91,19 +91,40 @@ Node* expr() {
 Node* mul() {
   Token *token;
 
-  Node* lhs = term();
+  Node* lhs = unary();
 
   token = get_token_from_tokens(pos);
   if (token->ty == '*') {
     pos++;
-    return new_node('*', lhs, mul());
+    return new_node('*', lhs, unary());
   }
 
   if (token->ty == '/') {
     pos++;
-    return new_node('/', lhs, mul());
+    return new_node('/', lhs, unary());
   }
 
+  return lhs;
+}
+
+Node* unary(void) {
+  Token *token;
+  Node *lhs;
+
+  token = get_token_from_tokens(pos);
+
+  if(token->ty == '+'){
+    pos++;
+    lhs = term();
+    return lhs;
+  }
+
+  if(token->ty == '-') {
+    pos++;
+    return new_node('-', new_node_num(0), term());
+  }
+
+  lhs = term();
   return lhs;
 }
 

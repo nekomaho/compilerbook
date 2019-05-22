@@ -14,6 +14,7 @@ void new_code(Node *node);
 Node* assign(void);
 Node* expr(void);
 Node* mul(void);
+Node* unary(void);
 Node* term(void);
 
 #endif
