@@ -47,10 +47,10 @@ int gen(Node *node) {
   printf("  pop rax\n");
 
   switch (node->ty) {
-    case '+':
+    case ND_PLUS:
       printf("  add rax, rdi\n");
       break;
-    case '-':
+    case ND_MINUS:
       printf("  sub rax, rdi\n");
       break;
     case '*':

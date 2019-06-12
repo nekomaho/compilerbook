@@ -155,12 +155,12 @@ Node* add() {
   token = get_token_from_tokens(pos);
   if (token->ty == '+') {
     pos++;
-    return new_node('+', lhs, expr());
+    return new_node(ND_PLUS, lhs, expr());
   }
 
   if (token->ty == '-') {
     pos++;
-    return new_node('-', lhs, expr());
+    return new_node(ND_MINUS, lhs, expr());
   }
 
   return lhs;
@@ -205,7 +205,7 @@ Node* unary(void) {
 
   if(token->ty == '-') {
     pos++;
-    return new_node('-', new_node_num(0), term());
+    return new_node(ND_MINUS, new_node_num(0), term());
   }
 
   lhs = term();

@@ -4,12 +4,14 @@
 enum {
   ND_NUM = 256, // 整数ノードの型
   ND_IDNET,
-  ND_EQ,  // ==
-  ND_NEQ, // !=
-  ND_LT,  // <
-  ND_LTE, // <=
-  ND_RT,  // >
-  ND_RTE, // >=
+  ND_PLUS,  // +
+  ND_MINUS, // - 
+  ND_EQ,    // ==
+  ND_NEQ,   // !=
+  ND_LT,    // <
+  ND_LTE,   // <=
+  ND_RT,    // >
+  ND_RTE,   // >=
 };
 
 // Node
