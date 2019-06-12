@@ -4,8 +4,11 @@
 enum {
   ND_NUM = 256, // 整数ノードの型
   ND_IDNET,
+  ND_SUB,   // =
   ND_PLUS,  // +
   ND_MINUS, // - 
+  ND_MULTI, // *
+  ND_DIV,   // /
   ND_EQ,    // ==
   ND_NEQ,   // !=
   ND_LT,    // <

@@ -29,7 +29,7 @@ int gen(Node *node) {
       return GEN_SUCCESS;
   }
 
-  if (node->ty == '=') {
+  if (node->ty == ND_SUB) {
     gen_lval(node->lhs);
     gen(node->rhs);
 
@@ -53,10 +53,10 @@ int gen(Node *node) {
     case ND_MINUS:
       printf("  sub rax, rdi\n");
       break;
-    case '*':
+    case ND_MULTI:
       printf("  mul rdi\n");
       break;
-    case '/':
+    case ND_DIV:
       printf("  mov rdx, 0\n");
       printf("  div rdi\n");
   }

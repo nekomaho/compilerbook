@@ -49,7 +49,7 @@ Node* assign() {
 
   if (token->ty == '=') {
     pos++;
-    return new_node('=', lhs, assign());
+    return new_node(ND_SUB, lhs, assign());
   }
 
   return lhs;
@@ -177,12 +177,12 @@ Node* mul() {
   token = get_token_from_tokens(pos);
   if (token->ty == '*') {
     pos++;
-    return new_node('*', lhs, unary());
+    return new_node(ND_MULTI, lhs, unary());
   }
 
   if (token->ty == '/') {
     pos++;
-    return new_node('/', lhs, unary());
+    return new_node(ND_DIV, lhs, unary());
   }
 
   return lhs;
