@@ -69,7 +69,85 @@ void program() {
   }
 }
 
+/*
+  expr = equality
+*/
 Node* expr() {
+  Node* lhs = equality();
+
+  return lhs;
+}
+
+/*
+  equality = relational ("==" relational | "!=" relational)*
+*/
+Node* equality() {
+  Token *token;
+
+  Node* lhs = relational();
+
+  token = get_token_from_tokens(pos);
+  if (token->ty == '=') {
+    pos++;
+    token = get_token_from_tokens(pos);
+    if (token->ty == '=') {
+      pos++;
+      return new_node(ND_EQ, lhs, relational());
+    } else {
+      pos--;
+    }
+  }
+
+  if (token->ty == '!') {
+    pos++;
+    token = get_token_from_tokens(pos);
+    if (token->ty == '=') {
+      pos++;
+      return new_node(ND_NEQ, lhs, relational());
+    }
+  }
+
+  return lhs;
+}
+
+/*
+  relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+*/
+Node* relational() {
+  Token *token;
+
+  Node* lhs = add();
+
+  token = get_token_from_tokens(pos);
+  if (token->ty == '<') {
+    pos++;
+    token = get_token_from_tokens(pos);
+    if (token->ty == '=') {
+      pos++;
+      return new_node(ND_LTE, lhs, add());
+    } else {
+      return new_node(ND_LT, lhs, add());
+    }
+  }
+
+  if (token->ty == '>') {
+    pos++;
+    token = get_token_from_tokens(pos);
+    if (token->ty == '=') {
+      pos++;
+      return new_node(ND_RTE, lhs, add());
+    } else {
+      return new_node(ND_RT, lhs, add());
+    }
+  }
+
+  return lhs;
+}
+
+/*
+  add = mul ("+" expr | "-" expr)*
+*/
+Node* add() {
   Token *token;
 
   Node* lhs = mul();
@@ -88,6 +166,9 @@ Node* expr() {
   return lhs;
 }
 
+/*
+  mul = unary ("*" unary | "/" unary)*
+*/
 Node* mul() {
   Token *token;
 
@@ -107,6 +188,9 @@ Node* mul() {
   return lhs;
 }
 
+/*
+  unary = ("+" | "-")? term
+*/
 Node* unary(void) {
   Token *token;
   Node *lhs;
@@ -128,6 +212,9 @@ Node* unary(void) {
   return lhs;
 }
 
+/*
+  term = num | "(" expr ")"
+*/
 Node* term() {
   Token *token;
   token = get_token_from_tokens(pos);
