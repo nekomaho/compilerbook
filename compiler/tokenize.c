@@ -19,6 +19,9 @@ Vector *tokenize(char *p) {
     token = malloc(sizeof(Token));
 
     switch(*p) {
+      case '!':
+      case '>':
+      case '<':
       case '+':
       case '-':
       case '*':

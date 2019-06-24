@@ -59,6 +59,29 @@ int gen(Node *node) {
     case ND_DIV:
       printf("  mov rdx, 0\n");
       printf("  div rdi\n");
+      break;
+    case ND_EQ:
+      printf("  cmp rax, rdi\n");
+      printf("  sete al\n");
+      printf("  movzx rax, al\n");
+      break;
+    case ND_NEQ:
+      printf("  cmp rax, rdi\n");
+      printf("  setne al\n");
+      printf("  movzx rax, al\n");
+      break;
+    case ND_LT:
+    case ND_RT:
+      printf("  cmp rax, rdi\n");
+      printf("  setl al\n");
+      printf("  movzx rax, al\n");
+      break;
+    case ND_LTE:
+    case ND_RTE:
+      printf("  cmp rax, rdi\n");
+      printf("  setle al\n");
+      printf("  movzx rax, al\n");
+      break;
   }
 
   printf("  push rax\n");

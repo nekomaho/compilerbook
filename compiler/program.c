@@ -90,7 +90,9 @@ Node* equality() {
   if (token->ty == '=') {
     pos++;
     token = get_token_from_tokens(pos);
-    if (token->ty == '=') {
+    if (token->ty == '=')
+    {
+      //fprintf(stderr, "kiteru");
       pos++;
       return new_node(ND_EQ, lhs, relational());
     } else {
@@ -135,9 +137,9 @@ Node* relational() {
     token = get_token_from_tokens(pos);
     if (token->ty == '=') {
       pos++;
-      return new_node(ND_RTE, lhs, add());
+      return new_node(ND_RTE, add(), lhs);
     } else {
-      return new_node(ND_RT, lhs, add());
+      return new_node(ND_RT, add(), lhs);
     }
   }
 
