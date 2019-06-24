@@ -14,39 +14,11 @@ static int gen_lval(Node *node){
   return GEN_ERROR_END;
 }
 
-int gen(Node *node) {
-  if (node->ty == ND_NUM) {
-    printf("  push %d\n", node->val);
-    return GEN_SUCCESS;
-  }
-
-  if (node->ty == ND_IDNET) {
-      if (GEN_ERROR_END == gen_lval(node))
-          return GEN_ERROR_END;
-      printf("  pop rax\n");
-      printf("  mov rax, [rax]\n");
-      printf("  push rax\n");
-      return GEN_SUCCESS;
-  }
-
-  if (node->ty == ND_SUB) {
-    gen_lval(node->lhs);
-    gen(node->rhs);
-
-    printf("  pop rdi\n");
-    printf("  pop rax\n");
-    printf("  mov [rax], rdi\n");
-    printf("  push rdi\n");
-    return GEN_SUCCESS;
-  }
-
-  gen(node->lhs);
-  gen(node->rhs);
-
+static int gen_operator(int operator) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  switch (node->ty) {
+  switch (operator) {
     case ND_PLUS:
       printf("  add rax, rdi\n");
       break;
@@ -87,6 +59,46 @@ int gen(Node *node) {
   printf("  push rax\n");
   return GEN_SUCCESS;
 }
+
+int gen(Node *node) {
+  if (node->ty == ND_NUM) {
+    printf("  push %d\n", node->val);
+    return GEN_SUCCESS;
+  }
+
+  if (node->ty == ND_IDNET) {
+      if (GEN_ERROR_END == gen_lval(node))
+          return GEN_ERROR_END;
+      printf("  pop rax\n");
+      printf("  mov rax, [rax]\n");
+      printf("  push rax\n");
+      return GEN_SUCCESS;
+  }
+
+  if (node->ty == ND_SUB) {
+    gen_lval(node->lhs);
+    gen(node->rhs);
+
+    printf("  pop rdi\n");
+    printf("  pop rax\n");
+    printf("  mov [rax], rdi\n");
+    printf("  push rdi\n");
+    return GEN_SUCCESS;
+  }
+
+  if (node->ty == ND_RETURN) {
+    gen(node->lhs);
+    return GEN_SUCCESS;
+  }
+
+  gen(node->lhs);
+  gen(node->rhs);
+
+  gen_operator(node->ty);
+
+  return GEN_SUCCESS;
+}
+
 
 int output_asm(void) {
   printf(".intel_syntax noprefix\n");

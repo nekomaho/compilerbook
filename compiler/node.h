@@ -15,6 +15,7 @@ enum {
   ND_LTE,   // <=
   ND_RT,    // >
   ND_RTE,   // >=
+  ND_RETURN,// return
 };
 
 // Node

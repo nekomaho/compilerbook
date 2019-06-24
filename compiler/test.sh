@@ -44,4 +44,6 @@ try 0 "0>=1;"
 try 1 "2>=1;"
 try 0 "1>1;"
 try 1 "2>1;"
+try 5 "return 5;"
+try 3 "a=1+2; return a;"
 echo 0

@@ -38,12 +38,21 @@ static Token *get_token_from_tokens(int pos) {
   return (Token *)(tokens->data)[pos];
 }
 
+/*
+  assign = expr ";"
+         | expr "=" assign
+         | "return" expr  ";"
+*/
 Node* assign() {
   Token *token;
 
   Node* lhs = expr();
 
   token = get_token_from_tokens(pos);
+  if (token->ty == TK_RETURN){
+    return new_node(ND_RETURN, lhs, assign());
+  }
+
   if (token->ty == ';')
     return lhs;
 
