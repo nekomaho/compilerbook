@@ -20,7 +20,7 @@ Node* new_node_num(int val) {
   return node;
 }
 
-Node* new_node_idnet(char name) {
+Node* new_node_idnet(char *name) {
   Node* node = malloc(sizeof(Node));
 
   node->ty = ND_IDNET;

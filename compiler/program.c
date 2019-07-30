@@ -241,7 +241,7 @@ Node* term() {
     token = get_token_from_tokens(pos);
     pos++;
     stack_count++;
-    return new_node_idnet((char)token->val);
+    return new_node_idnet((char *)token->variabale_name);
   }
 
   if (token->ty == '(') {

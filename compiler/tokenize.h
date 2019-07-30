@@ -15,6 +15,7 @@ enum {
 typedef struct {
   int ty; //トークンの型
   int val; //tyがTK_NUMの場合、その数値
+  char *variabale_name; //変数文字列
   char *input; //トークン文字列
 } Token;
 

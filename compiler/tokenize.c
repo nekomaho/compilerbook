@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include "tokenize.h"
 
@@ -11,9 +12,11 @@ static int is_alnum(char c) {
 }
 
 Vector *tokenize(char *p) {
-  int i = 0;
   Vector *tokens;
   Token *token;
+  char *variable_str;
+  char *head;
+  int str_count = 0;
 
   tokens = new_vector();
 
@@ -29,7 +32,6 @@ Vector *tokenize(char *p) {
     {
       token->ty = TK_RETURN;
       token->input = p;
-      i++;
       p += 6;
       continue;
     }
@@ -48,7 +50,6 @@ Vector *tokenize(char *p) {
       case ';':
         token->ty = *p;
         token->input = p;
-        i++;
         p++;
         vec_push(tokens, token);
         continue;
@@ -58,18 +59,29 @@ Vector *tokenize(char *p) {
       token->ty = TK_NUM;
       token->input = p;
       token->val = strtol(p, &p, 10);
-      i++;
       vec_push(tokens, token);
       continue;
     }
 
-    if ('a' <= *p && *p <= 'z') {
-      token->ty = TK_IDENT;
-      token->input = p;
-      token->val =  *p;
-      i++;
+    // 変数のトークナイズ
+    str_count = 0;
+    head = p;
+
+    while ('a' <= *p && *p <= 'z')
+    {
+      str_count++;
       p++;
+    }
+
+    if (str_count > 0) {
+      variable_str = (char *)calloc(str_count, sizeof(char));
+      strncpy(variable_str, head, str_count);
+
+      token->ty = TK_IDENT;
+      token->input = head;
+      token->variabale_name =  variable_str;
       vec_push(tokens, token);
+      str_count = 0;
       continue;
     }
 

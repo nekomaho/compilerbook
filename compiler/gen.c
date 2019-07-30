@@ -4,9 +4,14 @@
 #include "tokenize.h"
 
 static int gen_lval(Node *node){
+  int offset = 0;
+  for (int i = 0; i < strlen(node->name); i++)
+  {
+    offset += (node->name[i] - 'a' + 1 ) * 8;
+  }
   if (node->ty == ND_IDNET) {
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n",('z' - node->name + 1) * 8);
+    printf("  sub rax, %d\n",offset);
     printf("  push rax\n");
 
     return GEN_SUCCESS;

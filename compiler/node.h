@@ -24,11 +24,11 @@ typedef struct Node {
   struct Node *lhs; // 左辺
   struct Node *rhs; // 右辺
   int val; //tyがND_NUMの場合に数字が入る
-  char name; //tyがND_IDNETの場合に変数名が入る
+  char *name; //tyがND_IDNETの場合に変数名が入る
 } Node;
 
 Node* new_node(int ty, Node *lhs, Node *rhs);
 Node* new_node_num(int val);
-Node* new_node_idnet(char name);
+Node* new_node_idnet(char *name);
 
 #endif
