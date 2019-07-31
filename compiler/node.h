@@ -16,6 +16,8 @@ enum {
   ND_RT,    // >
   ND_RTE,   // >=
   ND_RETURN,// return
+  ND_IF,    // if
+  ND_ELSE,  // else
 };
 
 // Node

@@ -42,15 +42,34 @@ static Token *get_token_from_tokens(int pos) {
   assign = expr ";"
          | expr "=" assign
          | "return" expr  ";"
+         | "if" "(" expr ")" assign ( else assign )?
 */
 Node* assign() {
   Token *token;
 
-  Node* lhs = expr();
+  Node *lhs = expr();
+  Node *lhs_assign;
 
-  token = get_token_from_tokens(pos);
+      token = get_token_from_tokens(pos);
   if (token->ty == TK_RETURN){
     return new_node(ND_RETURN, lhs, assign());
+  }
+
+  if (token->ty == TK_IF) {
+    pos++;
+    if (token->ty == '(') {
+      new_node(ND_IF, lhs, expr());
+    }
+    if (token->ty != ')') {
+      fprintf(stderr, "if文の開きカッコに対する閉じカッコがありません：%s", token->input);
+      exit(1);
+    }
+    lhs_assign = assign();
+    if (token->ty == TK_ELSE) {
+      return new_node(ND_ELSE, lhs, assign());
+    } else {
+      return lhs_assign; 
+    }
   }
 
   if (token->ty == ';')
